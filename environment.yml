@@ -1,0 +1,44 @@
+name: sigilum
+channels:
+  - conda-forge
+  - pytorch
+dependencies:
+  - python=3.9
+
+  # Core scientific computing
+  - numpy
+  - scipy
+  - matplotlib
+  - pandas
+
+  # Image processing
+  - opencv
+  - scikit-image
+  - pillow
+
+  # Machine learning
+  - pytorch
+  - torchvision
+  - scikit-learn
+
+  # Web framework
+  - streamlit
+
+  # Utilities
+  - pathlib
+  - tqdm
+  - pytest
+  - jupyter
+
+  # OCR dependencies (conda packages where available)
+  - tesseract
+
+  # Pip dependencies
+  - pip
+  - pip:
+    - pytesseract
+    - streamlit-option-menu
+    - plotly
+    - seaborn
+    - imutils
+    - argparse
