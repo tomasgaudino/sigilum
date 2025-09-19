@@ -1,6 +1,16 @@
-.PHONY: install uninstall setup-ocr update
+.PHONY: install uninstall setup-ocr update run check_last_trial
 
 ENV_NAME = sigilum
+
+# --- Hardcoded experiment params for `make run`
+CHEQUE        = data/cheques/cheque_test_01.png
+CUENTA        = 001-123456/7
+FIRMAS_DIR    = data/firmas
+PIPELINE_CFG  = configs/pipeline_from_legacy.yaml
+SEARCH_CFG    = configs/search_spaces.yaml
+METRICS_CFG   = configs/metrics_profile.yaml
+MODE          = both
+LOG_LEVEL     = DEBUG
 
 # Installation and setup
 install:
@@ -21,7 +31,7 @@ setup-ocr:
 			echo "✅ Tesseract installed via Homebrew"; \
 		else \
 			echo "❌ Homebrew not found. Please install Homebrew first:"; \
-			echo "   /bin/bash -c \"\$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
+			echo "   /bin/bash -c \"$$(/usr/bin/curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\""; \
 			echo "   Then run 'make setup-ocr' again"; \
 			exit 1; \
 		fi; \
@@ -56,3 +66,27 @@ update:
 	@echo "📦 Updating environment..."
 	conda env update -f environment.yml
 	@echo "✅ Environment updated"
+
+# --- Run the hardcoded experiment
+run:
+	@echo "▶️  Running Sigilum with hardcoded params..."
+	conda run -n $(ENV_NAME) python main.py \
+	  --cheque $(CHEQUE) \
+	  --cuenta '$(CUENTA)' \
+	  --firmas_dir $(FIRMAS_DIR) \
+	  --pipeline_cfg $(PIPELINE_CFG) \
+	  --search_cfg $(SEARCH_CFG) \
+	  --metrics_cfg $(METRICS_CFG) \
+	  --mode $(MODE) \
+	  --log-level $(LOG_LEVEL)
+
+# --- Render HTML for the most recent run in ./runs
+check_last_trial:
+	@echo "🔎 Locating latest run in ./runs ..."
+	@last=$$(ls -1dt runs/* 2>/dev/null | head -n 1); \
+	if [ -z "$$last" ]; then echo "❌ No runs found in ./runs"; exit 1; fi; \
+	echo "🧪 Last run: $$last"; \
+	conda run -n $(ENV_NAME) python -m sigilum.reporting.html_report --run "$$last"; \
+	echo "📄 Report: $$last/aggregate/report.html"; \
+	( command -v open >/dev/null 2>&1 && open "$$last/aggregate/report.html" ) || \
+	( command -v xdg-open >/dev/null 2>&1 && xdg-open "$$last/aggregate/report.html" ) || true

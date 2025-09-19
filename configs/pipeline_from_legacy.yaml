@@ -1,0 +1,63 @@
+pipeline:
+  - phase: AutoResize
+    params: {max_side: 1600}
+
+  - phase: DeskewBorder
+    params: {canny_low: 50, canny_high: 150, hough_thresh: 120, min_apply_angle: 0.7, max_angle_deg: 5}
+
+  - phase: BorderBlur
+    params: {gauss_sigma: 3.0}
+
+  - phase: Illumination
+    params: {mode: "none", clahe_clip: 2.0, clahe_tile: 8, bg_kernel: 8.0}
+
+  - phase: ColorSelect
+    params: {enabled: false, space: "LAB", channel: 1}
+
+  - phase: Denoise
+    params: {mode: "bilateral", bil_d: 2, bil_sigma: 21, nl_patch: 5, nl_dist: 9, nl_h: 0.8}
+
+  - phase: Binarization
+    params:
+      mode: "otsu"         # "otsu" | "adaptive" | "sauvola"
+      invert: true
+      sauvola_window: 41
+      sauvola_k: 0.3
+      adaptive_window: 35
+      adaptive_C: 10
+
+  - phase: Morphology
+    params: {open_sz: 1, open_iter: 1, close_sz: 3, close_iter: 1, min_area: 118}
+
+  - phase: OCRMask
+    params: {enabled: true, lang: "eng", min_conf: 0, pad: 10}
+
+  - phase: RemoveLinesBoxes
+    params:
+      morph_h_len: 256
+      morph_v_len: 160
+      morph_iter: 1
+      use_hough: false
+      canny_low: 50
+      canny_high: 150
+      hough_thresh: 80
+      min_line_len_frac: 0.25
+      max_line_gap: 10
+      angle_tol_deg: 7.5
+      erase_thickness: 3
+      remove_rectangles: true
+      rect_min_area: 0
+      rect_eps_frac: 0.02
+      rect_min_aspect: 2.2
+      rect_min_extent: 0.35
+      hollow_max_extent: 0.6
+      hollow_min_wh_sum: 180
+
+  - phase: Candidate
+    params: {canny_low: 32, canny_high: 40, close_sz: 3, min_area: 2300, pad: 8}
+
+  - phase: AutoCrop
+    params: {enabled: true, padding: 10, min_content_ratio: 0.01, size: [256, 256]}
+
+  - phase: Skeletonization
+    params: {enabled: true, method: "skimage", resize_before: false, size: [256, 256], max_ms: 2000}
