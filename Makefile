@@ -1,4 +1,4 @@
-.PHONY: install uninstall setup-ocr update run check_last_trial
+.PHONY: install uninstall setup-ocr update run check_last_trial dev
 
 ENV_NAME = sigilum
 
@@ -90,3 +90,8 @@ check_last_trial:
 	echo "📄 Report: $$last/aggregate/report.html"; \
 	( command -v open >/dev/null 2>&1 && open "$$last/aggregate/report.html" ) || \
 	( command -v xdg-open >/dev/null 2>&1 && xdg-open "$$last/aggregate/report.html" ) || true
+
+# --- Dashboard development server
+dev:
+	@echo "🚀 Starting Sigilum Dashboard development server..."
+	cd sigilum-dashboard && npm run dev
