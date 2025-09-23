@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, BarChart3, RefreshCw } from 'lucide-react';
+import { Search, BarChart3, RefreshCw, Zap } from 'lucide-react';
 import { RunInfo } from './types';
 import { loadRunData } from './utils/dataLoader';
 import RunCard from './components/RunCard';
 import RunDetails from './components/RunDetails';
+import Experimentation from './components/Experimentation';
 
 function App() {
   const [runs, setRuns] = useState<RunInfo[]>([]);
@@ -11,6 +12,7 @@ function App() {
   const [selectedRun, setSelectedRun] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState<'dashboard' | 'experimentation'>('dashboard');
 
   useEffect(() => {
     loadRuns();
@@ -37,6 +39,14 @@ function App() {
     }
   };
 
+  if (currentView === 'experimentation') {
+    return (
+      <Experimentation
+        onBack={() => setCurrentView('dashboard')}
+      />
+    );
+  }
+
   if (selectedRun) {
     return (
       <RunDetails
@@ -57,6 +67,13 @@ function App() {
               <h1 className="text-2xl font-bold text-gray-900">Sigilum Dashboard</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setCurrentView('experimentation')}
+                className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              >
+                <Zap className="w-4 h-4" />
+                <span>Experimentation Lab</span>
+              </button>
               <button
                 onClick={loadRuns}
                 className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
