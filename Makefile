@@ -1,4 +1,4 @@
-.PHONY: install uninstall setup-ocr update run dev check_last_trial
+.PHONY: install uninstall setup-ocr update run check_last_trial
 
 ENV_NAME = sigilum
 
@@ -79,11 +79,6 @@ run:
 	  --metrics_cfg $(METRICS_CFG) \
 	  --mode $(MODE) \
 	  --log-level $(LOG_LEVEL)
-
-# --- Start development dashboard
-dev:
-	@echo "🚀 Starting Sigilum Dashboard..."
-	cd sigilum-dashboard && npm run dev
 
 # --- Render HTML for the most recent run in ./runs
 check_last_trial:
